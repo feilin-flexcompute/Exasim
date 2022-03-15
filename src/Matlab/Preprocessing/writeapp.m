@@ -11,7 +11,7 @@ app.problem  = [app.hybrid appname app.temporalscheme app.torder app.nstage app.
                app.saveSolFreq app.saveSolOpt app.timestepOffset app.stgNmode app.saveSolBouFreq app.ibs ...
                app.dae_steps app.saveResNorm app.AVsmoothingIter app.frozenAVflag app.problem];
 app.factor = [app.time app.dae_alpha app.dae_beta app.dae_gamma app.dae_epsilon app.factor];           
-app.solversparam = [app.NLtol app.linearsolvertol app.matvectol app.NLparam app.solversparam];        
+app.solversparam = [app.NLtol app.linearsolvertol app.matvectol app.NLparam app.scaling app.solversparam];
 
 ndims = zeros(40,1);
 ndims(1) = app.mpiprocs;  % number of processors

@@ -1066,6 +1066,7 @@ struct commonstruct {
     dstype linearSolverRelError;
     dstype rampFactor;               // Ramp factor for artificial viscosity flux
     dstype PTCparam;
+    dstype scaling;
     dstype tau0=0.0;
     dstype dae_alpha=1.0;
     dstype dae_beta=0.0;

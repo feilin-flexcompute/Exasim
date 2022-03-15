@@ -14,7 +14,7 @@ def writeapp(app,filename):
     app['problem'] = concatenate([tmp, app['problem']]);
     tmp = array([app['time'], app['dae_alpha'], app['dae_beta'], app['dae_gamma'], app['dae_epsilon']])    
     app['factor'] = concatenate([tmp, app['factor']]);
-    tmp = array([app['NLtol'], app['linearsolvertol'], app['matvectol'], app['NLparam']]);
+    tmp = array([app['NLtol'], app['linearsolvertol'], app['matvectol'], app['NLparam'], app['scaling']]);
     app['solversparam'] = concatenate([tmp, app['solversparam']]);
 
     app['flag'] = array(app['flag']).flatten('F');

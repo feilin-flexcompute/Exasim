@@ -8,7 +8,7 @@ pde.gpucompiler = "nvcc";
 pde.mpirun = "mpirun";
 pde.metis = "mpmetis";
 pde.gmsh = "gmsh";
-pde.paraview = "paraview";
+pde.paraview = "/Applications/ParaView-5.9.0.app/Contents/MacOS/paraview";
 pde.enzyme = [];
 
 pde.codename = "Exasim";
@@ -90,6 +90,7 @@ pde.NLparam = 0.0;
 pde.NLtol = 1e-6;
 pde.linearsolvertol = 1e-3;
 pde.matvectol = 1e-3;
+pde.scaling = 1.0;
 
 pde.flag = [0 0];
 pde.problem = [0 0];

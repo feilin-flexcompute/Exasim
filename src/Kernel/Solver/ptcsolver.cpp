@@ -20,6 +20,10 @@ int LinearSolver(sysstruct &sys, CDiscretization& disc, CPreconditioner& prec, o
     // residual norm
     dstype oldnrm = PNORM(disc.common.cublasHandle, N, sys.b, backend); 
                 
+
+    //scaling
+    //ArrayMultiplyScalar(sys.b, one/common.scaling, N, backend);  
+
     if (disc.common.mpiRank==0 && disc.common.saveResNorm==1 && it==1) {
         disc.common.timing[120] = disc.common.currentstep + 1.0;
         disc.common.timing[121] = disc.common.currentstage + 1.0;
@@ -38,7 +42,10 @@ int LinearSolver(sysstruct &sys, CDiscretization& disc, CPreconditioner& prec, o
         ArrayAXPBY(sys.v, sys.u, sys.x, one, one, N, backend);  
         disc.evalResidual(sys.r, sys.v, backend);  
         dstype nrmr = PNORM(disc.common.cublasHandle, N, sys.r, backend);
-                
+
+        //scaling
+        // ArrayMultiplyScalar(sys.r, one/common.scaling, N, backend);        
+        
         if (nrmr>1.05*oldnrm) {
             ArraySetValue(sys.x, zero, disc.common.ndof1, backend);
             // reset the reduced basis

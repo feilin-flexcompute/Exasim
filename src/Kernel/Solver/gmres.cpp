@@ -70,6 +70,7 @@ Int GMRES(sysstruct &sys, CDiscretization &disc, CPreconditioner& prec, Int back
         nrmr = nrmb;  
     }
 
+
     if (disc.common.mpiRank==0)
         cout<<"Old RHS Norm: "<<nrmb<<",  New RHS Norm: "<<nrmr<<endl; 
     

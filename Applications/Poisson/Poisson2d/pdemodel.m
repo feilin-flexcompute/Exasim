@@ -8,13 +8,14 @@ pde.initu = @initu;
 end
 
 function f = flux(u, q, w, v, x, t, mu, eta)
-f = mu*q;
+f = mu(1)*q;
 end
 
 function s = source(u, q, w, v, x, t, mu, eta)
 x1 = x(1);
 x2 = x(2);
-s = (2*pi*pi)*sin(pi*x1)*sin(pi*x2);
+L = mu(2);
+s = (2*pi*pi)*sin(pi*x1/L)*sin(pi*x2/L)/(L*L);
 end
 
 function fb = fbou(u, q, w, v, x, t, mu, eta, uhat, n, tau)

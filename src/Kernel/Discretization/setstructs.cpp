@@ -130,6 +130,8 @@ void setcommonstruct(commonstruct &common, appstruct &app, masterstruct &master,
     common.linearSolverTol = app.solversparam[1];
     common.matvecTol = app.solversparam[2];
     common.PTCparam = app.solversparam[3];
+    common.scaling = app.solversparam[4];
+
     if (common.tdep==1)
         common.time = app.factor[0];
     common.rampFactor = 1.0;   // Ramp factor for artificial viscosity flux        
@@ -137,7 +139,7 @@ void setcommonstruct(commonstruct &common, appstruct &app, masterstruct &master,
     common.dae_beta = app.factor[2];
     common.dae_gamma = app.factor[3];
     common.dae_epsilon = app.factor[4];
-    
+        
     common.nstgib = app.nsize[11];
     common.stgib = copyarray(app.stgib,app.nsize[11]); 
 

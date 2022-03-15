@@ -220,6 +220,7 @@ function initializepde(version)
     pde.NLtol = 1e-6;
     pde.linearsolvertol = 1e-3;
     pde.matvectol = 1e-3;
+    pde.scaling = 1.0;
 
     pde.flag = [0 0];
     pde.problem = [0 0];

@@ -502,8 +502,8 @@ void Residual(solstruct &sol, resstruct &res, appstruct &app, masterstruct &mast
     // change sign for matrix-vector product
     ArrayMultiplyScalar(res.Ru, minusone, common.ndof1, backend);     
         
-   //scaling
-    ArrayMultiplyScalar(res.Ru, one/common.scaling, common.ndof1, backend); 
+    //scaling
+    ArrayMultiplyScalar(res.Ru, 1/common.scaling, common.ndof1, backend); 
 
     //common.dtfactor
     if (common.tdep==1) 

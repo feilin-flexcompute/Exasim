@@ -28,10 +28,67 @@ void UhatBlock(solstruct &sol, resstruct &res, appstruct &app, masterstruct &mas
     Int n5 = nga*(ncx+nd+1+ncu+nc);             // og
     Int n6 = nga*(ncx+nd+1+ncu+nc+ncw);         // wg
     
-    if (ib==0) {        
-        GetFaceNodes(tmp.tempn, sol.udg, mesh.facecon, npf, ncu, npe, nc, f1, f2, 0, backend);        
+    // if (ib==0) {        
+    //     GetFaceNodes(tmp.tempn, sol.udg, mesh.facecon, npf, ncu, npe, nc, f1, f2, 0, backend);        
+    //     PutElemNodes(sol.uh, tmp.tempn, npf, ncu, 0, ncu, f1, f2, backend);        
+    // }
+
+ if (ib==0) {     
+	if (common.HDGflag == 0) {
+	        GetFaceNodes(tmp.tempn, sol.udg, mesh.facecon, npf, ncu, npe, nc, f1, f2, 0, backend);        
+        	PutElemNodes(sol.uh, tmp.tempn, npf, ncu, 0, ncu, f1, f2, backend);        
+	}
+	else {
+        // compute xdg1 on faces
+        GetArrayAtIndex(tmp.tempn, sol.xdg, &mesh.findxdg1[npf*ncx*f1], nn*ncx, backend);
+        Node2Gauss(handle, &tmp.tempg[n0], tmp.tempn, master.shapfnt, npf, npf, nf*ncx, backend);    
+    
+        // compute normal vector nl
+        if (nd==1) {
+            FaceGeom1D(&tmp.tempg[n2], &tmp.tempg[n1], &tmp.tempg[n3], nga, backend);
+        }
+        else if (nd==2){
+            Node2Gauss(handle, &tmp.tempg[n3], tmp.tempn, &master.shapfnt[npf*npf], npf, npf, nf*nd, backend);                
+            FaceGeom2D(&tmp.tempg[n2], &tmp.tempg[n1], &tmp.tempg[n3], nga, backend);
+        }
+        else if (nd==3) {
+            Node2Gauss(handle, &tmp.tempg[n3], tmp.tempn, &master.shapfnt[npf*npf], npf, npf, nf*nd, backend);                     
+            Node2Gauss(handle, &tmp.tempg[n3+nga*nd], tmp.tempn, &master.shapfnt[2*npf*npf], npf, npf, nf*nd, backend);                
+            FaceGeom3D(&tmp.tempg[n2], &tmp.tempg[n1], &tmp.tempg[n3], nga, backend);
+        }        
+        
+        // compute udg1 = (u1, q1) and store it in &tmp.tempn[npf*ncu*nf]
+        GetFaceNodes(&tmp.tempn[npf*ncu*nf], sol.udg, mesh.facecon, npf, nc, npe, nc, f1, f2, 1, backend);        
+        
+        // compute udg2 = (u1, q1) and store it in &tmp.tempn[npf*(ncu+nc)*nf]
+        GetFaceNodes(&tmp.tempn[npf*(ncu+nc)*nf], sol.udg, mesh.facecon, npf, nc, npe, nc, f1, f2, 2, backend);        
+                
+        if (nco>0) { 
+            // compute odg1 
+            GetFaceNodes(&tmp.tempg[n2], sol.odg, mesh.facecon, npf, nco, npe, nco, f1, f2, 1, backend);        
+      
+            // compute odg2 
+            GetFaceNodes(&tmp.tempg[n2+npf*nf*nco], sol.odg, mesh.facecon, npf, nco, npe, nco, f1, f2, 2, backend);        
+        }
+        
+        if (ncw>0) { 
+            // compute wdg1 
+            GetFaceNodes(&tmp.tempg[n2+npf*nf*(2*nco)], sol.wdg, mesh.facecon, npf, ncw, npe, ncw, f1, f2, 1, backend);        
+      
+            // compute wdg2 
+            GetFaceNodes(&tmp.tempg[n2+npf*nf*(2*nco+ncw)], sol.wdg, mesh.facecon, npf, ncw, npe, ncw, f1, f2, 2, backend);        
+        }
+        
+        // Compute uhat = 0.5*(u1 + u2) + (0.5/tau)*(F(udg1) - F(udg2)) * nl 
+        UhatDriver(tmp.tempn, &tmp.tempg[n0], &tmp.tempn[npf*ncu*nf], &tmp.tempn[npf*(ncu+nc)*nf], 
+                    &tmp.tempg[n2], &tmp.tempg[n2+npf*nf*nco], &tmp.tempg[n2+npf*nf*(2*nco)], &tmp.tempg[n2+npf*nf*(2*nco+ncw)],
+                    &tmp.tempg[n1], &tmp.tempg[n1], mesh, master, app, sol, tmp, common, npf, f1, f2, backend);      
+        
+        // set uh = uhat
         PutElemNodes(sol.uh, tmp.tempn, npf, ncu, 0, ncu, f1, f2, backend);        
+	}
     }
+
     //else if (isin(ib, common.stgib, common.nstgib)) {        
 //     else if (ib <= 2) {        
 //         // synthetic turbulence generation    

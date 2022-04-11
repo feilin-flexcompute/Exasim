@@ -106,7 +106,8 @@ void setcommonstruct(commonstruct &common, appstruct &app, masterstruct &master,
     common.AVsmoothingIter = app.problem[25]; //Number of times artificial viscosity is smoothed
     common.frozenAVflag = app.problem[26]; // Flag deciding if artificial viscosity is calculated once per non-linear solve or in every residual evluation
                                            //   0: AV not frozen, evaluated every iteration
-                                           //   1: AV frozen, evluated once per solve (default)          
+                                           //   1: AV frozen, evluated once per solve (default)
+    common.HDGflag = app.problem[27];
 
     common.linearSolver = app.problem[12];  /* 0: GMRES; 1: CG; etc. */      
     common.nonlinearSolverMaxIter = app.problem[13];                

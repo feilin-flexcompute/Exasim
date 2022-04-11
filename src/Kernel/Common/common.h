@@ -1041,7 +1041,9 @@ struct commonstruct {
     Int AVsmoothingIter;           //Number of times artificial viscosity is smoothed
     Int frozenAVflag;    // Flag deciding if artificial viscosity is calculated once per non-linear solve or in every residual evluation
                                 //   0: AV not frozen, evaluated as part of residual
-                                //   1: AV frozen, evluated once per solve (default)   
+                                //   1: AV frozen, evluated once per solve (default)
+    Int HDGflag;         // Flag deciding if using an HDG discretization
+                        //   0: DG, 1: HDG
 
     Int linearSolver;  /* 0: GMRES; 1: CG; etc. */      
     Int nonlinearSolver;

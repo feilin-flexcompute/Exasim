@@ -23,6 +23,7 @@ pde.cpulibflags = "";
 pde.gpulibflags = "";
 pde.pdemodel="ModelD";
 pde.modelnumber = 0;
+pde.HDGflag = 0;
 
 pde.preprocessmode = 1;
 pde.mpiprocs = 1;

@@ -1,56 +1,80 @@
-function [p,t,dgnodes] = mkmesh_circincirc_Ma17b(porder,m,n,r1,r2,alpha)
+function [p,t,dgnodes] = mkmesh_circincirc_adapted(porder,m,n,r0,r1,r2)
 % This routine is inspired from mkmesh_circincirc_half, but adapted to the
 % Ma = 17.605 case presented in Barter Thesis.
-
-elemtype = 1;
-[p,t] = squaremesh(m-1,n-1,1,elemtype);
-p=p'; 
+% Creates a mesh of 2 non-circumcentric circles.
+% r0 is the radius of the cylinder. r1 is the distance from the origin to
+% the external circle in the x axis, r2 is the distance in the y axis
 
 %%%%%%%%%%% Defines 3 regions with different refining speeds %%%%%%%%%%%%%%
 % Number of element in radial direction for each region
-nn1 = ceil(7.25*n/10); nn2 = ceil(1.75*n/10); nn3 = n-nn1-nn2;
+% nn1 = ceil(6*n/10); nn2 = ceil(3.25*n/10); nn3 = n-nn1-nn2;
+% nn1 = ceil(5*n/10); nn2 = n-nn1;
+nn1 = ceil(4.375*n/10); nn2 = ceil(4.375*n/10); nn3 = n-nn1-nn2;
 % Position of transition between refinement areas
-x12 = 0.1; x23 = 0.375;
-ln1 = loginc(linspace(0.00,x12,nn1+1),alpha);
-ln2 = loginc(linspace(x12, x23,nn2+1),1.25);
-ln3 = loginc(linspace(x23,1.00,nn3),2);
-ln  = [ln1(1:end-1) ln2(1:end-1) ln3];
-ln  = reshape(ones(m,1)*ln,[m*n,1]);
+x12 = 0.05; x23 = 0.6;
 
-% %%%%%%%%%%% Defines 3 regions with different refining speeds %%%%%%%%%%%%%%
-% % Number of element in radial direction for each region
-% nn1 = ceil(5.5*n/10); nn2 = ceil(3.05*n/10); nn3 = n-nn1-nn2;
-% % Position of transition between refinement areas
-% x12 = 0.1; x23 = 0.375;
-% ln1 = loginc(linspace(0.00,x12,nn1+1),alpha);
-% ln2 = loginc(linspace(x12, x23,nn2+1),1);
-% ln3 = loginc(linspace(x23,1.00,nn3),2);
-% ln  = [ln1(1:end-1) ln2(1:end-1) ln3];
-% ln  = reshape(ones(m,1)*ln,[m*n,1]);
+dlay = x12;
+dwall = 1e-5; %% decrease  
+xv = linspace(0, 1, m); 
+yref = [8e-5 5e-4 2e-4];
+
+[p1,t1,yv] = lesmesh2d_rect(dlay, dwall, nn1, xv, yref);
+p1 = p1';
+
+elemtype = 1;
+[p2,t2] = squaremesh(m-1,nn2+nn3-1,1,elemtype);
+% [p2,t2] = squaremesh(m-1,nn2-1,1,elemtype);
+p2=p2';
+
+ln2 = loginc(linspace(x12, x23,nn2+1),1);
+ln3 = loginc(linspace(x23,1.00,nn3),1.15);
+ln  = [ln2(1:end-1) ln3];
+ln  = reshape(ones(m,1)*ln,[m*(nn2+nn3),1]);
+
+% ln2 = loginc(linspace(x12, 1.00,nn2),1);
+% ln = ln2;
+% ln  = reshape(ones(m,1)*ln,[m*nn2,1]);
 
 % Assign mesh point positions
-p(:,2) = ln;
-%p(:,2) = loginc(p(:,2),alpha); % OLD VERSION
-%plot(ln,ln,'.'); % A SUPPRIMER
+p2(:,2) = ln;
+
+[p,t] = connectmesh(p1,t1',p2,t2',1e-12);
+[p,t]=fixmesh(p,t');
+
 ind = p(:,1)<=0.5;
-p(ind,1) = logdec(p(ind,1),1.25);
+p(ind,1) = logdec(p(ind,1),2.5);
 ind = p(:,1)>=0.5;
-p(ind,1) = loginc(p(ind,1),1.25);
+p(ind,1) = loginc(p(ind,1),2.5);
 
 dgnodes = mkdgnodes(p',t,porder);
 
 pnew = p;
-pnew(:,1) = -(r1+(r2-r1)*p(:,2)).*sin(pi*p(:,1));
-pnew(:,2) = -(r1+(r2-r1)*p(:,2)).*cos(pi*p(:,1));
-[p,t] = fixmesh(pnew,t');
+pnew(:,1) = -(r0+(r1-r0)*p(:,2)).*sin(pi*p(:,1));
+pnew(:,2) = -(r0+(r2-r0)*p(:,2)).*cos(pi*p(:,1));
+[p,t]=fixmesh(pnew,t');
 p = p';
 t = t';
 
+% p = mesh.dgnodes;   
 pnew = zeros(size(dgnodes));
-pnew(:,1,:) = -(r1+(r2-r1)*dgnodes(:,2,:)).*sin(pi*dgnodes(:,1,:));
-pnew(:,2,:) = -(r1+(r2-r1)*dgnodes(:,2,:)).*cos(pi*dgnodes(:,1,:));
+pnew(:,1,:) = -(r0+(r1-r0)*dgnodes(:,2,:)).*sin(pi*dgnodes(:,1,:));
+pnew(:,2,:) = -(r0+(r2-r0)*dgnodes(:,2,:)).*cos(pi*dgnodes(:,1,:));
 dgnodes = pnew;
 
+% R = (r1^2 + r2^2)/(2*r1);
+% r2var = sqrt((R-r1)^2*sin(pi*p(:,1)).^2 + R^2 - (R-r1)^2) - (R-r1)*sin(pi*p(:,1));
+% pnew = p;
+% pnew(:,1) = -(r0+(r2var-r0).*p(:,2)).*sin(pi*p(:,1));
+% pnew(:,2) = -(r0+(r2var-r0).*p(:,2)).*cos(pi*p(:,1));
+% [p,t]=fixmesh(pnew,t');
+% p = p';
+% t = t';
+% 
+% pnew = zeros(size(dgnodes));
+% r2var = sqrt((R-r1)^2*sin(pi*dgnodes(:,1)).^2 + R^2 - (R-r1)^2) - (R-r1)*sin(pi*dgnodes(:,1));
+% pnew(:,1,:) = -(r0+(r2var-r0).*dgnodes(:,2,:)).*sin(pi*dgnodes(:,1,:));
+% pnew(:,2,:) = -(r0+(r2var-r0).*dgnodes(:,2,:)).*cos(pi*dgnodes(:,1,:));
+% dgnodes = pnew;
 
 function dgnodes = mkdgnodes(p,t,porder)
 %CREATEDGNODES Computes the Coordinates of the DG nodes.
@@ -133,3 +157,4 @@ for dim=1:nd
     dgnodes(:,dim,:)=dgnodes(:,dim,:)+reshape(dp,[npl 1 ne]);
   end
 end
+

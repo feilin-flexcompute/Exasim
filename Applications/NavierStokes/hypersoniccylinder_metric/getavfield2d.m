@@ -15,7 +15,7 @@ Hmin = 1.0e-4;
 % regularization parameters for the bulk viscosity
 kb = avbulk;      % kb = 1.5 for Ma<6
 sb0   = param(16);
-sbmax = param(17) / sqrt(gam*gam - 1.0);
+sbmax = param(17)/sqrt(gam*gam - 1.0);
 sbmin = 0.0;
 
 % mesh size
@@ -33,19 +33,18 @@ ry = qdg(5);
 ruy = qdg(6);
 rvy = qdg(7);
 
-% Regularization of density 
-%rreg = r0 + lmax(r-r0,alpha);
+% Regularization of density
 r = rmin + lmax(r-rmin,alpha);
 r1 = 1./r;
 uv = ru.*r1;
 vv = rv.*r1;
 E = rE.*r1;
 q = 0.5*(uv.*uv+vv.*vv);
-H = gam*E - gam1*q;                    % Enthalpy (Critical Speed of Sound ???)
+H = gam*E - gam1*q;                    % Enthalpy (Critical Speed of Sound)
 H = Hmin + lmax(H-Hmin,alpha);         % Regularized Enthalpy
 
 % Critical speed of Sound
-c_star = sqrt((2.*gam1.*H) ./ (gam+1));
+c_star = sqrt((2.*gam1.*H) ./ (gam+1));     %should be critical
 
 % Computing derivatives for the sensors
 ux = (rux - rx.*uv).*r1;
@@ -57,7 +56,7 @@ vort = - (vx - uy);
 vort = sqrt(vort.*vort);
 
 % limit  divergence and vorticity
-sigm = 1e4;
+sigm = 1e3;     %instead of 1e4
 div_v = limiting(div_v,-sigm,sigm,alpha,-sigm);
 vort = limiting(vort,0.0,sigm,alpha,0.0);
 
@@ -66,17 +65,9 @@ DucrosRatio = div_v.*div_v ./ (div_v.*div_v + vort.*vort + 1.0e-16);
 % DucrosRatio = 1.0;
 sb = - (hm./porder) .* (div_v./c_star) .* DucrosRatio;
 sb = limiting(sb,sbmin,sbmax,alpha,sb0);
+
 % Artificial Bulk viscosity
 avb = r.*(kb.*hm./(porder)) .* sqrt(uv.*uv + vv.*vv + c_star.*c_star) .* sb;
 
 % Assign artificial viscosities
 avField(1) = avb;  %  bulk
-
-
-
-
-
-
-
-
-

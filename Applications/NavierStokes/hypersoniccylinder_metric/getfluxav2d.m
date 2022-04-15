@@ -74,13 +74,15 @@ Ty = 1/gam1*(py*r - p*ry)*r1^2;
 T = p/(gam1*r);
 Tphys = Tref/Tinf * T;
 mu = getViscosity(muRef,Tref,Tphys,1);
-mu = mu + avs;
-fc = mu*gam/(Pr);
+fc = mu*gam/Pr;
+
 % Viscous fluxes with artificial viscosities
-txx = (mu)*c23*(2*ux - vy) + (avb)*(ux+vy);
-txy = (mu)*(uy + vx);
-tyy = (mu)*c23*(2*vy - ux) + (avb)*(ux+vy);
-fv = [avr*rx, txx, txy, uv*txx + vv*txy + (fc+avk)*Tx, ...
-      avr*ry, txy, tyy, uv*txy + vv*tyy + (fc+avk)*Ty];
+mu = mu + avs;
+fc = fc + avk;
+txx = mu*c23*(2*ux - vy) + (avb)*(ux+vy);
+txy = mu*(uy + vx);
+tyy = mu*c23*(2*vy - ux) + (avb)*(ux+vy);
+fv = [avr*rx, txx, txy, uv*txx + vv*txy + fc*Tx, ...
+      avr*ry, txy, tyy, uv*txy + vv*tyy + fc*Ty];
 f = fi+fv;
 

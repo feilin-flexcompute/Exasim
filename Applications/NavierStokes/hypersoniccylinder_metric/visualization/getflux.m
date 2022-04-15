@@ -51,8 +51,8 @@ tyy = mu.*c23.*(2*vy - ux);
 sz = size(txx);
 
 
-f = [zeros(sz), txx, txy, fc.*Tx, ...
-      zeros(sz), txy, tyy, fc.*Ty];
+f = [0*txx, txx, txy, fc.*Tx, ...
+      0*txx, txy, tyy, fc.*Ty];
   
   
   

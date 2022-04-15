@@ -6,7 +6,7 @@ pde.fbou = @fbou;
 pde.ubou = @ubou;
 pde.initu = @initu;
 pde.avfield = @avfield;
-pde.stab = @stab;
+% pde.stab = @stab;
 end
 
 function m = mass(u, q, w, v, x, t, mu, eta)
@@ -29,8 +29,9 @@ end
 function fb = fbou(u, q, w, v, x, t, mu, eta, uhat, n, tau)
 
     f = flux(uhat, q, w, v, x, t, mu, eta);
-%     fi = f(:,1)*n(1) + f(:,2)*n(2) + 4*(u-uhat); % numerical flux at freestream boundary
-    ftau = stab(u, q, w, v, x, t, mu, eta, uhat, n, tau, uhat, q, w, v);
+%     fi = f(:,1)*n(1) + f(:,2)*n(2) + tau*(u-uhat); % numerical flux at freestream boundary
+%     ftau = stab(u, q, w, v, x, t, mu, eta, uhat, n, tau, uhat, q, w, v);
+    ftau = tau*(u-uhat);
     fi = f(:,1)*n(1) + f(:,2)*n(2) + ftau; % numerical flux at freestream boundary
 
     
@@ -41,8 +42,9 @@ function fb = fbou(u, q, w, v, x, t, mu, eta, uhat, n, tau)
     
     % Flux Thermal Wall
     ftw = fi;
-    ftw(1) = ftau(1);
-%     ftw(1) = 0.0;
+%     ftw(1) = tau*(u(1)-uhat(1));
+%     ftw(1) = ftau(1);
+    ftw(1) = 0.0;
     
     % freestream, adiabatic wall, isothermal wall, adiabatic slip wall, supersonic inflow, supersonic outflow
     fb = [fi faw ftw faw fi fi]; 
@@ -129,9 +131,13 @@ function u0 = initu(x, mu, eta)
     u0 = sym(mu(5:8)); % freestream flow   
 end
 
-function ftau = stab(u1, q1, w1, v1, x, t, mu, eta, uhat, n, tau, u2, q2, w2, v2) 
-    ftau = stabRoe2D(u1,u2,n,mu);
-end
+% function ftau = stab(u1, q1, w1, v1, x, t, mu, eta, uhat, n, tau, u2, q2, w2, v2) 
+% %     f1 = flux(u1, q1, w1, v1, x, t, mu, eta);
+% %     f2 = flux(u2, q2, w2, v2, x, t, mu, eta);
+% %     ftau = stabLF2D(u1,u2,n,mu);
+%     ftau = stabRoe2D(u1,u2,n,mu);
+% %     ftau = stabHLLEM2D(u1,u2,n,mu);
+% end
 
 
 

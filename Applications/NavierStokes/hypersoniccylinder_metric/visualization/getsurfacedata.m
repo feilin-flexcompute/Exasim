@@ -10,10 +10,10 @@ Minf= param(4);
 pinf = 1/(gam*Minf^2);
 
 % Get some dimensions
-nd  = master.dim;
+nd  = master.nd;
 ngf = master.ngf;
 npf = master.npf;
-ne  = size(mesh.t,2);
+ne  = size(mesh.t,1);
 nfe = size(master.perm,2);
 
 % Check that we have the gradients
@@ -37,7 +37,7 @@ end
 % Get shape functions on faces
 perm   = master.perm(:,:,1);
 for d=1:nd
-    master.shapft(:,:,d) = master.shapfgt(:,:,d);
+    master.shapft(:,:,d) = master.shapfc(:,:,d)';
 end
 shapft = squeeze(master.shapft(:,:,1));
 dshapft  = reshape(permute(master.shapft(:,:,2:nd),[1 3 2]),[ngf*(nd-1) npf]);
@@ -53,11 +53,10 @@ for i=1:ne
     dg = mesh.dgnodes(:,1:nd,i);
     udg = UDG(:,:,i);
     
-%     fc=mesh.f(abs(mesh.t2f(i,:)),end);  % fc=mesh.f(abs(mesh.t2f(i,:)),4);
-    fc = mesh.f(:,i);
+    fc=mesh.f(abs(mesh.t2f(i,:)),end);  % fc=mesh.f(abs(mesh.t2f(i,:)),4);
     
     for is = 1:nfe
-        if fc(is) == wid
+        if fc(is) == -wid
             pn    = dg(perm(:,is),:);
             pg    = shapft*pn;
             udgg  = shapft*udg(perm(:,is),:);
@@ -84,7 +83,7 @@ for i=1:ne
             end
             
             if (getallcoefs)
-                fluxWall = getflux(udgg,param);
+                fluxWall = getfluxWall(udgg,param);
                 fluxWall = reshape(fluxWall,[ngf,ncu,ndu]);
                 for ii=1:ncu
                     fh(:,ii) = fluxWall(:,ii,1) .* nlg(:,1) + fluxWall(:,ii,2) .* nlg(:,2);
@@ -108,14 +107,14 @@ for i=1:ne
                 cfNew = tau;
                 chNew = q;
             elseif elemAvg == 1
-                xNew = sum(abs(jac).*master.gwf.*pg(:,1))/sum(abs(jac).*master.gwf);
-                yNew = sum(abs(jac).*master.gwf.*pg(:,2))/sum(abs(jac).*master.gwf);
+                xNew = sum(abs(jac).*master.gwfc.*pg(:,1))/sum(abs(jac).*master.gwfc);
+                yNew = sum(abs(jac).*master.gwfc.*pg(:,2))/sum(abs(jac).*master.gwfc);
                 if nd == 3
-                    zNew = sum(abs(jac).*master.gwf.*pg(:,3))/sum(abs(jac).*master.gwf);
+                    zNew = sum(abs(jac).*master.gwfc.*pg(:,3))/sum(abs(jac).*master.gwfc);
                 end
-                cpNew = sum(abs(jac).*master.gwf.*pr)/sum(abs(jac).*master.gwf);
-                cfNew = sum(abs(jac).*master.gwf.*tau)/sum(abs(jac).*master.gwf);
-                chNew = sum(abs(jac).*master.gwf.*q)/sum(abs(jac).*master.gwf);
+                cpNew = sum(abs(jac).*master.gwfc.*pr)/sum(abs(jac).*master.gwfc);
+                cfNew = sum(abs(jac).*master.gwfc.*tau)/sum(abs(jac).*master.gwfc);
+                chNew = sum(abs(jac).*master.gwfc.*q)/sum(abs(jac).*master.gwfc);
             else
                 error('elemAvg has invalid value');
             end

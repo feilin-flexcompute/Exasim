@@ -59,17 +59,14 @@ dru   = rur-rul;
 drv   = rvr-rvl;
 drE   = rEr-rEl;
 
-%     rlam1 = sqrt((uni+ci)*(uni+ci) + entropyfix);
-%     rlam2 = sqrt((uni-ci)*(uni-ci) + 1e-6);
-%     rlam3 = sqrt(uni*uni + 1e-6);
-
 lam1 = uni+ci;
 lam2 = uni-ci;
 lam3 = uni;
 
-rlam1 = 0.5*(lam1+entropyfix) + 0.5*(lam1-entropyfix).*tanh(1e3*(lam1-entropyfix));
-rlam2 = 0.5*(lam2+entropyfix) + 0.5*(lam2-entropyfix).*tanh(1e3*(lam2-entropyfix));
-rlam3 = 0.5*(lam3+entropyfix) + 0.5*(lam3-entropyfix).*tanh(1e3*(lam3-entropyfix));
+rlam1 = entropyfix + lmax(lam1-entropyfix,alpha);
+rlam2 = entropyfix + lmax(lam2-entropyfix,alpha);
+rlam3 = entropyfix + lmax(lam3-entropyfix,alpha);
+
 
 s1    = 0.5*(rlam1+rlam2);
 s2    = 0.5*(rlam1-rlam2);

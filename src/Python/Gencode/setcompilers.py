@@ -83,6 +83,8 @@ def setcompilers(app):
         gpustatus2 = shutil.which("/usr/bin/nvcc");
         gpustatus3 = shutil.which("/usr/local/bin/nvcc");
         gpustatus4 = shutil.which("/opt/local/bin/nvcc");
+        gpustatus4 = shutil.which("/opt/local/bin/nvcc");
+        gpustatus5 = shutil.which("/usr/lib/cuda-11.2/bin/nvcc");
 
         if gpustatus0 != None:
             print("Using " + app['gpucompiler'] + " compiler for GPU source code");
@@ -98,6 +100,9 @@ def setcompilers(app):
         elif gpustatus4 != None:
             app['gpucompiler'] = "opt/local/bin/nvcc";
             print("Using opt/local/bin/nvcc compiler for GPU source code");
+        elif gpustatus5 != None:
+            app['gpucompiler'] = "/usr/lib/cuda-11.2/bin/nvcc";
+            print("Using /usr/lib/cuda-11.2/bin/nvcc compiler for GPU source code");
         else:
             exit("Exasim search in /usr/bin, /usr/local/bin, and /opt/local/bin and could not find NVCC compiler. Please see the documentation to install it. After installation, please set its path to app['gpucompiler']");
 
